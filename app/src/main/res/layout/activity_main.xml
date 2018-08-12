@@ -11,6 +11,9 @@
         android:layout_width="400dp"
         android:layout_height="400dp"
         android:layout_centerInParent="true"
+        app:max_progress="800"
+        app:start_angle="150"
+        app:sweep_angle="245"
         app:text_size="25sp" />
 
     <Button

@@ -222,7 +222,7 @@ class AntClassView @JvmOverloads constructor(
         if (!progress.isDouble()) return
         var tmpCurrentProgress = if (progress.toFloat() >= mMaxProgress) mMaxProgress else progress.toFloat()
         tmpCurrentProgress = Math.round(tmpCurrentProgress * 10) / 10.toFloat()
-        mIndicatorAnimator = ObjectAnimator.ofFloat(this, "currentProgress", tmpCurrentProgress)
+        mIndicatorAnimator = ObjectAnimator.ofFloat(this, "currentProgress", currentProgress.toFloat(), tmpCurrentProgress)
         mIndicatorAnimator?.apply {
             this.duration = 2000
             this.interpolator = BounceInterpolator()
