@@ -1,10 +1,7 @@
 package com.kotlin.hc.one
 
 import android.content.Context
-import android.graphics.BlurMaskFilter
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.util.Log
@@ -62,19 +59,21 @@ class CustomView @JvmOverloads constructor(
         mTextPaint.isAntiAlias = true//抗锯齿
         mTextPaint.textSize = 25f
         mTextPaint.color = Color.RED
-        val textWidth = mTextPaint.measureText(text)
-        val textHeight = -mTextPaint.ascent() + mTextPaint.descent()
+        val textWidth = mTextPaint.measureText(text)//测量文本的宽度
+        val textHeight = -mTextPaint.ascent() + mTextPaint.descent()//得到文本的高度
         canvas.save()
         canvas.translate(mDefaultWidth / 2f, mDefaultHeight / 2f)
         canvas.drawText(text, 0, text.length, -textWidth / 2, textHeight / 2, mTextPaint)
         canvas.restore()
 
-
         canvas.save()
         mTextPaint.textSize = 30f
         mTextPaint.color = Color.WHITE
-        val textNumWidth = mTextPaint.measureText(mTextNumber)//测量文本的宽度
-        val textNumHeight = -mTextPaint.ascent() + mTextPaint.descent()//得到文本的高度
+        //通过Rect获取文本宽度和高度
+        val rect = Rect()
+        mTextPaint.getTextBounds(mTextNumber, 0, mTextNumber.length, rect)
+        val textNumWidth = rect.width().toFloat()
+        val textNumHeight = rect.height().toFloat()
         canvas.translate(mDefaultWidth / 2f, mDefaultHeight / 2f)
         canvas.drawText(mTextNumber, 0, mTextNumber.length, -textNumWidth / 2, (textNumHeight / 2) - (textHeight + 10), mTextPaint)
         canvas.restore()
