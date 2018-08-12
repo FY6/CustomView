@@ -5,8 +5,8 @@
         <attr name="outcircle_stroke_Width" format="dimension" />
         <attr name="start_angle" format="float" />
         <attr name="sweep_angle" format="float" />
-        <attr name="max_progress" format="integer" />
-        <attr name="current_progress" format="integer" />
+        <attr name="max_progress" format="float" />
+        <attr name="current_progress" format="float" />
         <attr name="class_arrays" format="reference|string" />
         <attr name="text_size" format="dimension" />
     </declare-styleable>

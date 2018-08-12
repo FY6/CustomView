@@ -4,12 +4,16 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.*
 import android.text.TextPaint
+import android.text.TextUtils
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.view.animation.BounceInterpolator
 import com.kotlin.hc.R
 import com.kotlin.hc.dp2px
+import com.kotlin.hc.isDouble
 import com.kotlin.hc.sp2px
+import java.util.regex.Pattern
 
 /**
  * 芝麻信用
@@ -39,14 +43,14 @@ class AntClassView @JvmOverloads constructor(
     //刻度值
     private var mScaleValue = 0f
     //最大进度
-    private var mMaxProgress = 900
+    private var mMaxProgress = 900f
     private var mIndicatorAnimator: ObjectAnimator? = null
     //当前进度
     private var currentProgress = 0
     //字体大小
     private var mTextSize = 0f
 
-    private var mClassThred = 0
+    private var mClassThred = 0f
 
 
     private var mClassTextArray: Array<String> = emptyArray()
@@ -58,8 +62,8 @@ class AntClassView @JvmOverloads constructor(
 
     fun getClassTextArray() = mClassTextArray
 
-    fun setCurrentProgress(currentProgress: Int) {
-        this.currentProgress = currentProgress
+    fun setCurrentProgress(currentProgress: Float) {
+        this.currentProgress = Math.round(currentProgress * 10) / 10
         invalidate()
     }
 
@@ -72,8 +76,8 @@ class AntClassView @JvmOverloads constructor(
         mOutStrokeWidth = typedArray.getDimension(R.styleable.AntClass_outcircle_stroke_Width, dp2px(2).toFloat())
         mStartAngle = typedArray.getFloat(R.styleable.AntClass_start_angle, 160f)
         mSweepAngle = typedArray.getFloat(R.styleable.AntClass_sweep_angle, 220f)
-        mMaxProgress = typedArray.getInt(R.styleable.AntClass_max_progress, 900)
-        currentProgress = typedArray.getInt(R.styleable.AntClass_current_progress, 450)
+        mMaxProgress = typedArray.getFloat(R.styleable.AntClass_max_progress, 900f)
+        currentProgress = typedArray.getInt(R.styleable.AntClass_current_progress, 0)
         mTextSize = typedArray.getDimension(R.styleable.AntClass_text_size, sp2px(25).toFloat())
         mScaleValue = mSweepAngle / mScacleNumber
         typedArray.recycle()
@@ -83,7 +87,9 @@ class AntClassView @JvmOverloads constructor(
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val width = resolveSize(dp2px(400), widthMeasureSpec)
         val height = resolveSize(dp2px(400), heightMeasureSpec)
-        setMeasuredDimension(width, height)
+        //为了让画出来的圆弧更好看，所以把View的范围变为正方形
+        val lastResult = Math.max(width, height)
+        setMeasuredDimension(lastResult, lastResult)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -212,9 +218,11 @@ class AntClassView @JvmOverloads constructor(
     /**
      * 进度更新
      */
-    fun update(progress: Int) {
-        val tmpCurrentProgress = if (progress >= mMaxProgress) mMaxProgress else progress
-        mIndicatorAnimator = ObjectAnimator.ofInt(this, "currentProgress", tmpCurrentProgress)
+    fun update(progress: String) {
+        if (!progress.isDouble()) return
+        var tmpCurrentProgress = if (progress.toFloat() >= mMaxProgress) mMaxProgress else progress.toFloat()
+        tmpCurrentProgress = Math.round(tmpCurrentProgress * 10) / 10.toFloat()
+        mIndicatorAnimator = ObjectAnimator.ofFloat(this, "currentProgress", tmpCurrentProgress)
         mIndicatorAnimator?.apply {
             this.duration = 2000
             this.interpolator = BounceInterpolator()
