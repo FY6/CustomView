@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.*
 import android.text.TextPaint
-import android.text.TextUtils
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -13,7 +12,6 @@ import com.kotlin.hc.R
 import com.kotlin.hc.dp2px
 import com.kotlin.hc.isDouble
 import com.kotlin.hc.sp2px
-import java.util.regex.Pattern
 
 /**
  * 芝麻信用
@@ -70,7 +68,7 @@ class AntClassView @JvmOverloads constructor(
     fun getCurrentProgress() = currentProgress
 
     init {
-        setLayerType(LAYER_TYPE_SOFTWARE, null)
+        setLayerType(LAYER_TYPE_SOFTWARE, null)//关闭硬件加速
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.AntClass, 0, 0)
         mInnerStrokeWidth = typedArray.getDimension(R.styleable.AntClass_innercircle_stroke_Width, dp2px(5).toFloat())
         mOutStrokeWidth = typedArray.getDimension(R.styleable.AntClass_outcircle_stroke_Width, dp2px(2).toFloat())
@@ -144,6 +142,9 @@ class AntClassView @JvmOverloads constructor(
         val intArrayOf = intArrayOf(0xffffffff.toInt(), 0x00ffffff, 0x99ffffff.toInt(), 0xffffffff.toInt())
         paint.shader = SweepGradient(measuredWidth / 2f, measuredHeight / 2f, intArrayOf, null)
 
+        /*
+
+         */
         val sweep = currentProgress.toFloat() / mMaxProgress * mSweepAngle
         val radius = Math.min(measuredWidth / 4f, measuredHeight / 4f) + mInnerStrokeWidth + paint.strokeWidth + dp2px(5)
         val rectF = RectF(-radius, -radius, radius, radius)
@@ -166,6 +167,7 @@ class AntClassView @JvmOverloads constructor(
     private fun drawScale(canvas: Canvas) {
         canvas.save()
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
         paint.color = Color.parseColor("#D4AF72")
         paint.alpha = 0x70
         paint.style = Paint.Style.STROKE
@@ -174,10 +176,29 @@ class AntClassView @JvmOverloads constructor(
         val radius = Math.min(measuredWidth / 4f, measuredHeight / 4f)
         canvas.rotate(-270 + mStartAngle)
         for (index in 0..mScacleNumber) {
-            canvas.drawLine(0f, -radius + mInnerStrokeWidth / 2, 0f, -radius - mInnerStrokeWidth / 2, paint)
+            if (Math.round(mMaxProgress / mScacleNumber * index) % 300 == 0) {
+                paint.color = Color.parseColor("#ffffff")
+                paint.strokeWidth = dp2px(4).toFloat()
+                canvas.drawLine(0f, -radius + mInnerStrokeWidth + dp2px(3), 0f, -radius - mInnerStrokeWidth / 2, paint)
+            } else {
+                paint.color = Color.parseColor("#D4AF72")
+                paint.strokeWidth = dp2px(3).toFloat()
+                canvas.drawLine(0f, -radius + mInnerStrokeWidth / 2, 0f, -radius - mInnerStrokeWidth / 2, paint)
+            }
+            drawScaleText(index, canvas, radius)
             canvas.rotate(mScaleValue)
         }
         canvas.restore()
+    }
+
+    private fun drawScaleText(index: Int, canvas: Canvas, radius: Float) {
+        if (index % 2 == 0) {
+            val paintText = TextPaint(Paint.ANTI_ALIAS_FLAG)
+            val scaleText = Math.round(mMaxProgress / mScacleNumber * index)
+            val rect = Rect()
+            paintText.getTextBounds(scaleText.toString(), 0, scaleText.toString().length, rect)
+            canvas.drawText(scaleText.toString(), 0, scaleText.toString().length, -rect.width() / 2f, -radius + 3 * mInnerStrokeWidth, paintText)
+        }
     }
 
     private fun drawCircle(canvas: Canvas) {

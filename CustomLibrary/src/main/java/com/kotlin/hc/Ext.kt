@@ -17,7 +17,7 @@ fun View.sp2px(dp: Int): Int {
 }
 
 /*
-    判断是否是数字
+    正则表达式判断是否是数字
  */
 fun String.isDouble(): Boolean {
     val pattern = Pattern.compile("^[-\\+]?[.\\d]*$")
